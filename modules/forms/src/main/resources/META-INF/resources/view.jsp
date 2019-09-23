@@ -3,16 +3,44 @@
 
 <liferay-portlet:resourceURL var="resourceUrl" />
 
-<c:forEach items="${formNameList}" var="formName">
-formName.formInstanceId : ${formName.formInstanceId}<br/>
-formName.createDate :${formName.createDate}<br/>
-formName.name : ${formName.name}<br/>
-formName.description : ${formName.description}<br/>
-<button onclick="callServeResource(${formName.formInstanceId})" class="primary-button">Show data</button> <br/>
-<div class="displayformdata_${formName.formInstanceId}"></div>
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Form Name</th>
+        <th>Created Date</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+		<c:forEach items="${formNameList}" var="formName">
+	      <tr>
+	        <th scope="row">${formName.formInstanceId}</th>
+	        <td>${formName.name}</td>
+	        <td>${formName.createDate}</td>
+	        <td>${formName.description}</td>
+	        <td><button onclick="callServeResource(${formName.formInstanceId})" class="primary-button">Show data</button></td>
+	      </tr>
+		</c:forEach>
+    </tbody>
+  </table>
+</div>
 <br/>
-</c:forEach>
-
+<hr>
+<br/>
+<div class="table-responsive tabledata  hidden">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>email</th>
+      </tr>
+    </thead>
+    <tbody class="displayformdata">
+    </tbody>
+  </table>
+</div>
 
 <script type="text/javascript">
 function callServeResource(formID){
@@ -25,12 +53,13 @@ function callServeResource(formID){
                on: {
                    	success: function() {
 					var data = JSON.parse(this.get('responseData'));
-					$(".displayformdata_"+formID).html("");
+					$(".displayformdata").html("");
+					$(".tabledata").show();
 					if(data.length === 0){
-						$(".displayformdata_"+formID).append("<span> No form data present </span><br/>")
+						$(".displayformdata").append("<tr><td> No form data present </td></tr>");
 					}
 					$(data).each(function(index, value){
-						$(".displayformdata_"+formID).append("<span>"+ data[index].email +"</span><br/>");
+						$(".displayformdata").append("<tr><td>"+ data[index].email +"</td></tr>");
 					})
                    }
               }
