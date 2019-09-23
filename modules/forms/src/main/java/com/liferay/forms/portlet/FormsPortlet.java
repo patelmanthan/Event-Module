@@ -1,5 +1,18 @@
 package com.liferay.forms.portlet;
 
+import com.liferay.dynamic.data.mapping.model.DDMContent;
+import com.liferay.dynamic.data.mapping.service.DDMContentLocalServiceUtil;
+import com.liferay.forms.constants.FormsPortletKeys;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.WebKeys;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,21 +22,8 @@ import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
 
-import com.liferay.dynamic.data.mapping.model.DDMContent;
-import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
-import com.liferay.dynamic.data.mapping.service.DDMContentLocalServiceUtil;
-import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil;
-import com.liferay.forms.constants.FormsPortletKeys;
-import com.liferay.portal.kernel.json.JSONArray;
-import com.liferay.portal.kernel.json.JSONException;
-import com.liferay.portal.kernel.json.JSONFactoryUtil;
-import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-
 /**
- * @author manthan
+ * @author Parth
  */
 @Component(
 	immediate = true,
@@ -44,8 +44,11 @@ public class FormsPortlet extends MVCPortlet {
 	
 	@Override
 	public void render(RenderRequest renderRequest, RenderResponse renderResponse){
+		_log.info("render called.");
+		ThemeDisplay themeDisplay= (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		List<String> dataList = new ArrayList<>();
-		List<DDMContent> content = DDMContentLocalServiceUtil.getContents(0);
+		_log.info(themeDisplay.getSiteGroupId());
+		List<DDMContent> content = DDMContentLocalServiceUtil.getContents(themeDisplay.getSiteGroupId());
 		String userName = null;
 		for (DDMContent ddmContent : content) {
 			userName = ddmContent.getUserName();
@@ -64,6 +67,8 @@ public class FormsPortlet extends MVCPortlet {
 			}
 			
 		}
+		_log.info("Form data size : "+dataList.size());
+		_log.info("Form created User : "+userName);
 		renderRequest.setAttribute("list", dataList);
 		renderRequest.setAttribute("userName", userName);
 		
