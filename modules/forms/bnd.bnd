@@ -1,4 +1,4 @@
-Bundle-Name: forms
+Bundle-Name: custom-forms
 Bundle-SymbolicName: com.liferay.forms
 Bundle-Version: 1.0.0
 Export-Package: com.liferay.forms.constants
