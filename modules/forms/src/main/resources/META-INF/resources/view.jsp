@@ -35,6 +35,7 @@
     <thead>
       <tr>
         <th>email</th>
+         <th>Status</th>
       </tr>
     </thead>
     <tbody class="displayformdata">
@@ -59,7 +60,9 @@ function callServeResource(formID){
 						$(".displayformdata").append("<tr><td> No form data present </td></tr>");
 					}
 					$(data).each(function(index, value){
-						$(".displayformdata").append("<tr><td>"+ data[index].email +"</td></tr>");
+						if(!value.email == ''){
+							$(".displayformdata").append("<tr><td>"+ data[index].email +"</td><td><button>Approved</button></td></tr>");
+// 							$(".displayformdata").append("<tr><td><button onclick="callServeResourcee(${formName.formInstanceId})" class="primary-button">Approved</button></td></tr>");						}
 					})
                    }
               }
@@ -67,4 +70,33 @@ function callServeResource(formID){
  
     });
 }
+
+
+/* function callServeResourcee(formID){
+    AUI().use('aui-io-request', function(A){
+        A.io.request('${resourceUrl}', {
+        	method: 'post',
+               data: {
+            	   <portlet:namespace />Id: formID,
+               },
+               on: {
+                   	success: function() {
+					var data = JSON.parse(this.get('responseData'));
+					$(".displayformdata").html("");
+					$(".tabledata").show();
+					if(data.length === 0){
+						$(".displayformdata").append("<tr><td> No form data present </td></tr>");
+					}
+					$(data).each(function(index, value){
+						if(!value.email == ''){
+							$(".displayformdata").append("<tr><td>"+ data[index].email +"</td></tr>");
+							
+						}
+					})
+                   }
+              }
+        });
+ 
+    });
+} */
 </script>

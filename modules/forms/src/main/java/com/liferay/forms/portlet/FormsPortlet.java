@@ -80,6 +80,7 @@ public class FormsPortlet extends MVCPortlet {
 	public void serveResource(ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 			throws IOException, PortletException {
 		if(Validator.isNotNull(resourceRequest.getParameter("Id"))) {
+			_log.info("id================="+resourceRequest.getParameter("Id"));
 			List<Map<String, String>> dataList = new ArrayList<>();
 			Map<String, String> dataMap;
 			List<DDMFormInstanceRecord> fromInstances = DDMFormInstanceRecordLocalServiceUtil.getFormInstanceRecords(Long.parseLong(resourceRequest.getParameter("Id")));
@@ -94,6 +95,7 @@ public class FormsPortlet extends MVCPortlet {
 						JSONObject value = JSONFactoryUtil.createJSONObject(dataJson.getString("value"));
 						String fieldValue = value.getString("en_US");
 						dataMap.put("email", fieldValue);
+						dataMap.put("status", "approved");
 						dataList.add(dataMap);
 					}
 				} catch (PortalException e) {
