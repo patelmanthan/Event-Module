@@ -82,7 +82,6 @@ function approveRecord(recordID){
                on: {
                    	success: function() {
 					var data = JSON.parse(this.get('responseData'));
-					
                    }
               }
         });
