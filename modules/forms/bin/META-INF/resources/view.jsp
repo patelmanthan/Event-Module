@@ -64,26 +64,35 @@ function callServeResource(formID){
 						}
 						$(data).each(function(index, value){
 							if(!value.email == ''){
-								$(".displayformdata").append("<tr><td>"+ data[index].email +"</td><td><button onclick=\"approveRecord("+data[index].contentId+")\">Approved</button></td></tr>");
-							};
-		                  });
+								if(data[index].status === "1"){
+									$(".displayformdata").append("<tr><td>"+ data[index].email +"</td><td class="+data[index].recordVersionId+" ><button onclick=\"approveRecord("+data[index].contentId+","+data[index].kaleoInstanceTokenId+","+data[index].userId+","+data[index].recordVersionId+")\">Approved</button></td></tr>");
+								}else{
+									$(".displayformdata").append("<tr><td>"+ data[index].email +"</td></tr>");
+								}
+							}					
+						});
               		}
         		}
  
     	});
 	});
 }
-function approveRecord(recordID){
+function approveRecord(recordID, kaleoInstanceTokenId, userId,recordVersionId){
     AUI().use('aui-io-request', function(A){
         A.io.request('${resourceUrl}', {
         	method: 'post',
                data: {
             	   <portlet:namespace />recordID: recordID,
+            	   <portlet:namespace />kaleoInstanceTokenId : kaleoInstanceTokenId,
+            	   <portlet:namespace />userId : userId,
+            	   <portlet:namespace />recordVersionId : recordVersionId,
                },
                on: {
                    	success: function() {
 					var data = JSON.parse(this.get('responseData'));
-					
+					if(data.status == "success"){
+						$("."+recordVersionId).hide();
+					}
                    }
               }
         });
