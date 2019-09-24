@@ -30,10 +30,13 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.workflow.kaleo.model.KaleoInstance;
+import com.liferay.portal.workflow.kaleo.service.KaleoInstanceLocalServiceUtil;
 
 /**
  * @author Parth
@@ -88,20 +91,23 @@ public class FormsPortlet extends MVCPortlet {
 			List<DDMFormInstanceRecord> fromInstances = DDMFormInstanceRecordLocalServiceUtil.getFormInstanceRecords(Long.parseLong(resourceRequest.getParameter("Id")));
 			for (DDMFormInstanceRecord ddmFormInstanceRecord : fromInstances ) {
 				try {
-					dataMap = new HashMap<String, String>();
-					DDMContent ddmContent = DDMContentLocalServiceUtil.getContent(ddmFormInstanceRecord.getStorageId());
-					String data = ddmContent.getData();
-					_log.info(data);
-					JSONArray jsonArray = JSONFactoryUtil.createJSONObject(data).getJSONArray("fieldValues");
-					for (int i = 0; i < jsonArray.length(); i++) {
-						JSONObject dataJson = jsonArray.getJSONObject(i);
-						JSONObject value = JSONFactoryUtil.createJSONObject(dataJson.getString("value"));
-						String fieldValue = value.getString("en_US");
-						dataMap.put("email", fieldValue);
-						dataMap.put("contentId", String.valueOf(ddmContent.getContentId()));
-						//TODO Get status and update the below thing.
-						dataMap.put("status", "Approved");
-						dataList.add(dataMap);
+					List<KaleoInstance> kaleoInstanceList = KaleoInstanceLocalServiceUtil.getKaleoInstances(0, 10);
+						dataMap = new HashMap<String, String>();
+						DDMContent ddmContent = DDMContentLocalServiceUtil.getContent(ddmFormInstanceRecord.getStorageId());
+						String data = ddmContent.getData();
+						_log.info(data);
+						JSONArray jsonArray = JSONFactoryUtil.createJSONObject(data).getJSONArray("fieldValues");
+						for (int i = 0; i < jsonArray.length(); i++) {
+							JSONObject dataJson = jsonArray.getJSONObject(i);
+							JSONObject value = JSONFactoryUtil.createJSONObject(dataJson.getString("value"));
+							String fieldValue = value.getString("en_US");
+							dataMap.put("email", fieldValue);
+							dataMap.put("contentId", String.valueOf(ddmContent.getContentId()));
+							//TODO Get status and update the below thing.
+							for (KaleoInstance KaleoInstance : kaleoInstanceList) {
+							dataMap.put("status", String.valueOf(KaleoInstance.getCompleted()));
+							}
+							dataList.add(dataMap);
 					}
 				} catch (PortalException e) {
 					e.printStackTrace();
@@ -113,7 +119,18 @@ public class FormsPortlet extends MVCPortlet {
 		    super.serveResource(resourceRequest, resourceResponse);
 		}else if(Validator.isNotNull(resourceRequest.getParameter("recordID"))) {
 			_log.info("recordID" + resourceRequest.getParameter("recordID"));
+			
 			//TODO update the record with the approved status
+			try {
+				long recordID=Long.parseLong(resourceRequest.getParameter("recordID"));  
+//				DDMContent content = DDMContentLocalServiceUtil.getContent(recordID);
+//				DDMContentLocalServiceUtil.updateDDMContent(content);
+				KaleoInstance content = KaleoInstanceLocalServiceUtil.getKaleoInstance(recordID);
+				KaleoInstanceLocalServiceUtil.updateKaleoInstance(content);
+			} catch (NumberFormatException | PortalException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			super.serveResource(resourceRequest, resourceResponse);
 		}
 	}

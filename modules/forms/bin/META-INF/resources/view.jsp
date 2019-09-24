@@ -56,6 +56,7 @@ function callServeResource(formID){
                on: {
                    	success: function() {
 						var data = JSON.parse(this.get('responseData'));
+						console.log(data);
 						$(".displayformdata").html("");
 						$(".tabledata").show();
 						if(data.length === 0){
@@ -82,6 +83,7 @@ function approveRecord(recordID){
                on: {
                    	success: function() {
 					var data = JSON.parse(this.get('responseData'));
+					
                    }
               }
         });
