@@ -62,35 +62,6 @@ function callServeResource(formID){
 					$(data).each(function(index, value){
 						if(!value.email == ''){
 							$(".displayformdata").append("<tr><td>"+ data[index].email +"</td><td><button>Approved</button></td></tr>");
-// 							$(".displayformdata").append("<tr><td><button onclick="callServeResourcee(${formName.formInstanceId})" class="primary-button">Approved</button></td></tr>");						}
-					})
-                   }
-              }
-        });
- 
-    });
-}
-
-
-/* function callServeResourcee(formID){
-    AUI().use('aui-io-request', function(A){
-        A.io.request('${resourceUrl}', {
-        	method: 'post',
-               data: {
-            	   <portlet:namespace />Id: formID,
-               },
-               on: {
-                   	success: function() {
-					var data = JSON.parse(this.get('responseData'));
-					$(".displayformdata").html("");
-					$(".tabledata").show();
-					if(data.length === 0){
-						$(".displayformdata").append("<tr><td> No form data present </td></tr>");
-					}
-					$(data).each(function(index, value){
-						if(!value.email == ''){
-							$(".displayformdata").append("<tr><td>"+ data[index].email +"</td></tr>");
-							
 						}
 					})
                    }
@@ -98,5 +69,5 @@ function callServeResource(formID){
         });
  
     });
-} */
+}
 </script>
