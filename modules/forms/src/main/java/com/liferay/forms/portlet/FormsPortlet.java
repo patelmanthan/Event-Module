@@ -16,6 +16,7 @@ import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
 
+import com.liferay.dynamic.data.mapping.model.DDMContent;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
 import com.liferay.dynamic.data.mapping.service.DDMContentLocalServiceUtil;
@@ -32,6 +33,7 @@ import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 /**
  * @author Parth
@@ -87,7 +89,8 @@ public class FormsPortlet extends MVCPortlet {
 			for (DDMFormInstanceRecord ddmFormInstanceRecord : fromInstances ) {
 				try {
 					dataMap = new HashMap<String, String>();
-					String data = DDMContentLocalServiceUtil.getContent(ddmFormInstanceRecord.getStorageId()).getData();
+					DDMContent ddmContent = DDMContentLocalServiceUtil.getContent(ddmFormInstanceRecord.getStorageId());
+					String data = ddmContent.getData();
 					_log.info(data);
 					JSONArray jsonArray = JSONFactoryUtil.createJSONObject(data).getJSONArray("fieldValues");
 					for (int i = 0; i < jsonArray.length(); i++) {
@@ -95,7 +98,9 @@ public class FormsPortlet extends MVCPortlet {
 						JSONObject value = JSONFactoryUtil.createJSONObject(dataJson.getString("value"));
 						String fieldValue = value.getString("en_US");
 						dataMap.put("email", fieldValue);
-						dataMap.put("status", "approved");
+						dataMap.put("contentId", String.valueOf(ddmContent.getContentId()));
+						//TODO Get status and update the below thing.
+						dataMap.put("status", "Approved");
 						dataList.add(dataMap);
 					}
 				} catch (PortalException e) {
@@ -105,7 +110,11 @@ public class FormsPortlet extends MVCPortlet {
 			resourceRequest.setAttribute("data", dataList);
 			PrintWriter printout=resourceResponse.getWriter();
 		    printout.print(JSONFactoryUtil.createJSONArray(dataList).toJSONString());    
+		    super.serveResource(resourceRequest, resourceResponse);
+		}else if(Validator.isNotNull(resourceRequest.getParameter("recordID"))) {
+			_log.info("recordID" + resourceRequest.getParameter("recordID"));
+			//TODO update the record with the approved status
+			super.serveResource(resourceRequest, resourceResponse);
 		}
-		super.serveResource(resourceRequest, resourceResponse);
 	}
 }
