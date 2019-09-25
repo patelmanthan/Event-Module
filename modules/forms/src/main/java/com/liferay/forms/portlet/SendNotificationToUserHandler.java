@@ -22,19 +22,20 @@ public class SendNotificationToUserHandler extends BaseUserNotificationHandler{
 	@Override
 	protected String getBody(UserNotificationEvent userNotificationEvent, ServiceContext serviceContext)
 			throws Exception {
-//		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(userNotificationEvent.getPayload());
-//		String notificationText = jsonObject.getString("notificationText");
-//		String title = jsonObject.getString("title");
-//		String senderName = jsonObject.getString("senderName");
-		String body = getBodyTemplate();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject(userNotificationEvent.getPayload());
+		String title = jsonObject.getString("title");
+		String notificationText = jsonObject.getString("notificationMessage");
+		String body = StringUtil.replace(getBodyTemplate(), new String[] {
+				"[$TITLE$]", "[$BODY$]" },
+				new String[] { title, notificationText });
 		return body;
 	}
 	
 	@Override
 	protected String getBodyTemplate() throws Exception {
 		StringBuilder builder = new StringBuilder(5);
-		builder.append("<div class=\"title\">Title::Form entry approved</div><div");
-		builder.append("class=\"body\">Sender::Admin <br> Notification:: You dorm entry has been approved by admin</div>");
+		builder.append("<div class=\"title\">[$TITLE$]</div><div ");
+		builder.append("class=\"body\">[$BODY$]</div>");
 		return super.getBodyTemplate();
 	}
 }
