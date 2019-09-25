@@ -17,13 +17,15 @@
 <%@ include file="/init.jsp" %>
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
-<liferay-portlet:resourceURL var="getForm">
-	<liferay-portlet:param name="task" value="getFormValue"/>
-</liferay-portlet:resourceURL>
-
+<%@page import="com.liferay.dynamic.data.mapping.model.DDMFormInstance"%>
+<%@page import="com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil"%>
+<%@page import="java.util.Locale"%>
 
 
+<%
+long groupId = themeDisplay.getSiteGroupId();
+List<DDMFormInstance> formNameList = DDMFormInstanceLocalServiceUtil.getFormInstances(groupId);
+%>
 
 
 
@@ -311,11 +313,17 @@ while (manageableCalendarsIterator.hasNext()) {
 		<aui:fieldset markupView="lexicon">
 			<aui:input defaultLanguageId="<%= themeDisplay.getLanguageId() %>" name="title" />
 			
-		<aui:select name="form" class="form">
-<!-- 		    <aui:option label="Dr" value="dr" /> -->
-<!-- 		    <aui:option label="Mr" value="mr" /> -->
-<!-- 		    <aui:option label="Mrs" value="mrs" /> -->
-<!-- 		    <aui:option label="Ms" value="ms" /> -->
+		
+		<aui:select name="form" cssClass="form-id" onChange="changeform(this)">
+		   <% 
+		   for (DDMFormInstance ddmFormInstance : formNameList) {
+			   if(ddmFormInstance.getUserId() == themeDisplay.getUserId()){
+			   		String name = ddmFormInstance.getName(Locale.US);
+			   		String id = String.valueOf(ddmFormInstance.getFormInstanceId());
+		   %>
+		   <aui:option value="<%= id %>"><%= name %></aui:option>
+		   <% } %>
+		   <% } %>
 		</aui:select>
 
 			<div class="<%= allDay ? "allday-class-active" : "" %>" id="<portlet:namespace />startDateContainer">
@@ -1018,19 +1026,15 @@ while (manageableCalendarsIterator.hasNext()) {
 
 	scheduler.load();
 </aui:script>
-<script type="text/javascript">
-$(document).ready(function() {
-	$.ajax({
-		url : '${getForm}',
-		data : {
-			groupId :  34878
-		}, 
-		success : function(data) {
-			console.log("success"+data);	
-			$(data).each(function(index, value){
-				$('.form').append(`<option value=data[index].id> data[index].name </option>`); 
-			});
-		}
-	});
+<script>
+function changeform(){
+	$("input[name$='_ExpandoAttribute--formId--']").val($(".form-id").val())
+}
+$( document ).ready(function() {
+	if($("input[name$='_ExpandoAttribute--formId--']").val() == "")
+		changeform();
+	else{
+		$(".form-id").val($("input[name$='_ExpandoAttribute--formId--']").val());
+	}
 });
 </script>
