@@ -16,6 +16,7 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import com.liferay.dynamic.data.mapping.model.DDMContent;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
@@ -32,13 +33,15 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
+import com.liferay.portal.kernel.service.UserNotificationEventLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.kernel.workflow.WorkflowHandlerUtil;
-import com.liferay.portal.kernel.workflow.WorkflowStatusManagerUtil;
 import com.liferay.portal.workflow.kaleo.model.KaleoInstanceToken;
 import com.liferay.portal.workflow.kaleo.service.KaleoInstanceTokenLocalServiceUtil;
 
@@ -53,6 +56,12 @@ import com.liferay.portal.workflow.kaleo.service.KaleoInstanceTokenLocalServiceU
 public class FormsPortlet extends MVCPortlet {
 	private final static Log _log = LogFactoryUtil.getLog(FormsPortlet.class.getClass());
 
+	private UserNotificationEventLocalService _userNotificationEventLocalService;
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(UserNotificationEventLocalService userNotificationEventLocalService) {
+		_userNotificationEventLocalService = userNotificationEventLocalService;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -108,9 +117,11 @@ public class FormsPortlet extends MVCPortlet {
 						dataMap.put("userId", String.valueOf(ddmFormInstanceRecord.getUserId()));
 						List<KaleoInstanceToken> kaleoInstanceTokens = KaleoInstanceTokenLocalServiceUtil
 								.getKaleoInstanceTokens(-1, -1);
-						DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = DDMFormInstanceRecordVersionLocalServiceUtil.getFormInstanceRecordVersion(
-								ddmFormInstanceRecord.getFormInstanceRecordId(), ddmFormInstanceRecord.getVersion());
-						dataMap.put("recordVersionId", String.valueOf(ddmFormInstanceRecordVersion.getFormInstanceRecordVersionId()));
+						DDMFormInstanceRecordVersion ddmFormInstanceRecordVersion = DDMFormInstanceRecordVersionLocalServiceUtil
+								.getFormInstanceRecordVersion(ddmFormInstanceRecord.getFormInstanceRecordId(),
+										ddmFormInstanceRecord.getVersion());
+						dataMap.put("recordVersionId",
+								String.valueOf(ddmFormInstanceRecordVersion.getFormInstanceRecordVersionId()));
 						dataMap.put("status", String.valueOf(ddmFormInstanceRecordVersion.getStatus()));
 						for (KaleoInstanceToken kaleoInstanceToken : kaleoInstanceTokens) {
 							if (kaleoInstanceToken.getClassPK() == DDMFormInstanceRecordVersionLocalServiceUtil
@@ -135,6 +146,19 @@ public class FormsPortlet extends MVCPortlet {
 						Long.parseLong(resourceRequest.getParameter("userId")),
 						Long.parseLong(resourceRequest.getParameter("recordVersionId")),
 						WorkflowConstants.STATUS_APPROVED, null);
+				// TODO send user notification for successfull implementation.
+				JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+				jsonObject.put("userId", resourceRequest.getParameter("userId"));
+				jsonObject.put("title", "Form Submission Approved.");
+				jsonObject.put("senderName", "Admin");
+				jsonObject.put("notificationMessage",
+						"Your entries for the event has been approved successfully by admin.");
+				_log.info("Notification to be send");
+				_userNotificationEventLocalService.addUserNotificationEvent(Long.parseLong(resourceRequest.getParameter("userId")),
+						SendNotificationToUserHandler.PORTLET_ID, (new Date()).getTime(),
+						UserNotificationDeliveryConstants.TYPE_WEBSITE,
+						Long.parseLong(resourceRequest.getParameter("userId")), jsonObject.toString(), false, new ServiceContext());
+				_log.info("Notification done");
 				PrintWriter printout = resourceResponse.getWriter();
 				printout.print("{\"status\":\"success\"}");
 			} catch (NumberFormatException | PortalException e) {
