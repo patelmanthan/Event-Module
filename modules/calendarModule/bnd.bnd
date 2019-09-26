@@ -1,4 +1,0 @@
-Bundle-Name: calendarModule
-Bundle-SymbolicName: com.liferay.calendar
-Bundle-Version: 1.0.0
-Export-Package: com.liferay.calendar.constants

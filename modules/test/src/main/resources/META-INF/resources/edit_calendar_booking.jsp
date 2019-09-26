@@ -21,12 +21,12 @@
 <%@page import="com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil"%>
 <%@page import="java.util.Locale"%>
 
-
+<!-- custom Code start -->
 <%
 long groupId = themeDisplay.getSiteGroupId();
 List<DDMFormInstance> formNameList = DDMFormInstanceLocalServiceUtil.getFormInstances(groupId);
 %>
-
+<!-- custom Code end -->
 
 
 
@@ -313,7 +313,7 @@ while (manageableCalendarsIterator.hasNext()) {
 		<aui:fieldset markupView="lexicon">
 			<aui:input defaultLanguageId="<%= themeDisplay.getLanguageId() %>" name="title" />
 			
-		
+		<!-- custom Code start -->
 		<aui:select name="form" cssClass="form-id" onChange="changeform(this)">
 		   <% 
 		   for (DDMFormInstance ddmFormInstance : formNameList) {
@@ -325,6 +325,7 @@ while (manageableCalendarsIterator.hasNext()) {
 		   <% } %>
 		   <% } %>
 		</aui:select>
+		<!-- custom Code end -->
 
 			<div class="<%= allDay ? "allday-class-active" : "" %>" id="<portlet:namespace />startDateContainer">
 				<aui:input ignoreRequestValue="<%= true %>" label="starts" name="startTime" timeFormat="<%= timeFormat %>" value="<%= startTimeJCalendar %>" />
@@ -1026,6 +1027,7 @@ while (manageableCalendarsIterator.hasNext()) {
 
 	scheduler.load();
 </aui:script>
+<!-- custom Code start -->
 <script>
 function changeform(){
 	$("input[name$='_ExpandoAttribute--formId--']").val($(".form-id").val())
@@ -1038,3 +1040,4 @@ $( document ).ready(function() {
 	}
 });
 </script>
+<!-- custom Code end -->
