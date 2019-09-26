@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
+import javax.portlet.ProcessAction;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
@@ -18,6 +21,12 @@ import javax.portlet.ResourceResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import com.liferay.calendar.constants.CalendarConstants;
+import com.liferay.calendar.model.Calendar;
+import com.liferay.calendar.model.CalendarBooking;
+import com.liferay.calendar.model.CalendarBookingConstants;
+import com.liferay.calendar.service.CalendarBookingLocalServiceUtil;
+import com.liferay.calendar.service.CalendarLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMContent;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstanceRecord;
@@ -27,6 +36,7 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLocalServiceUtil;
 import com.liferay.forms.constants.FormsPortletKeys;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
@@ -40,6 +50,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.service.UserNotificationEventLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -75,19 +86,23 @@ public class FormsPortlet extends MVCPortlet {
 			throws IOException, PortletException {
 		_log.info("render called.");
 		ThemeDisplay themeDisplay = (ThemeDisplay) renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		long groupId = themeDisplay.getSiteGroupId();
-
-		List<DDMFormInstance> formNameList = DDMFormInstanceLocalServiceUtil.getFormInstances(groupId);
-		List<DDMFormInstance> formNameListFinal = new ArrayList<>();
-		for (DDMFormInstance ddmFormInstance : formNameList) {
-			if (ddmFormInstance.getUserId() == themeDisplay.getUserId())
-				formNameListFinal.add(ddmFormInstance);
-		}
-		_log.info(formNameListFinal);
-		renderRequest.setAttribute("formNameList", formNameListFinal);
+		//Get calendar events that are created by current user
+		Calendar calendar = CalendarLocalServiceUtil.fetchGroupCalendar(themeDisplay.getCompanyId(),themeDisplay.getSiteGroupId(), "Liferay");
+		System.out.println("claendarID" + calendar.getCalendarId());
+		System.out.println("Calendar Name " + calendar.getNameCurrentValue());
+		List<CalendarBooking> calendarBookings = new ArrayList<>();
+		Map<Long, String> formAttribute = new HashMap<>();
+		CalendarBookingLocalServiceUtil.getCalendarBookings(calendar.getCalendarId(), new int [] {WorkflowConstants.STATUS_APPROVED}).stream().filter(predicate -> predicate.getUserId() == themeDisplay.getUserId()).forEach(action ->{
+			action.setTitle(action.getTitleCurrentValue());
+			calendarBookings.add(action);
+			formAttribute.put(Long.valueOf(action.getCalendarBookingId()), (String) action.getExpandoBridge().getAttribute("formId"));
+		});
+		renderRequest.setAttribute("calendarBookings", calendarBookings);
+		renderRequest.setAttribute("formAttribute", formAttribute);
 		super.render(renderRequest, renderResponse);
 	}
 
+	
 	/*
 	 * (non-Javadoc)
 	 * 

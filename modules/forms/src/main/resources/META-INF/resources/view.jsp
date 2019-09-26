@@ -3,27 +3,27 @@
 
 <liferay-portlet:resourceURL var="resourceUrl" />
 
-<div class="table-responsive">
+	<div class="table-responsive">
 	<table class="table table-striped">
 		<thead>
 			<tr>
 				<th>#</th>
-				<th>Form Name</th>
-				<th>Created Date</th>
+				<th>Event Name</th>
+				<th>Start Time</th>
 				<th>Description</th>
 				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
-			<c:forEach items="${formNameList}" var="formName">
+			<c:forEach items="${calendarBookings}" var="calendarBooking">
 				<tr>
-					<th scope="row">${formName.formInstanceId}</th>
-					<td>${formName.name}</td>
-					<td>${formName.createDate}</td>
-					<td>${formName.description}</td>
+					<th scope="row">${calendarBooking.calendarBookingId}</th>
+					<td>${calendarBooking.title}</td>
+					<td>${calendarBooking.startTime}</td>
+					<td>${calendarBooking.endTime}</td>
 					<td><button
-							onclick="callServeResource(${formName.formInstanceId})"
-							class="primary-button">Show data</button></td>
+							onclick="callServeResource(${formAttribute.get(calendarBooking.calendarBookingId)})"
+							class="primary-button ">Show Event form data</button></td>
 				</tr>
 			</c:forEach>
 		</tbody>
@@ -99,4 +99,4 @@ function approveRecord(recordID, kaleoInstanceTokenId, userId,recordVersionId){
  
     });
 } 
-</script>
+</script> 
