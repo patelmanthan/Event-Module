@@ -19,7 +19,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page import="com.liferay.dynamic.data.mapping.model.DDMFormInstance"%>
 <%@page import="com.liferay.dynamic.data.mapping.service.DDMFormInstanceLocalServiceUtil"%>
+<%@page import="com.liferay.portal.kernel.service.RoleLocalServiceUtil" %>
+<%@page import="com.liferay.portal.kernel.service.UserGroupRoleLocalServiceUtil" %>
 <%@page import="java.util.Locale"%>
+<%@page import="com.liferay.portal.kernel.model.UserGroupRole" %>
+<%@page import="com.liferay.portal.kernel.service.UserLocalServiceUtil" %>
 
 <!-- custom Code start -->
 <%
@@ -388,6 +392,7 @@ while (manageableCalendarsIterator.hasNext()) {
 					</aui:select>
 
 					<aui:input name="location" />
+					
 
 					<liferay-expando:custom-attributes-available
 						className="<%= CalendarBooking.class.getName() %>"
@@ -407,6 +412,21 @@ while (manageableCalendarsIterator.hasNext()) {
 							/>
 						</aui:field-wrapper>
 					</c:if>
+					
+					<!-- Custom Code start -->
+					<aui:select name="assignTo" cssClass="workflowassign" onChange="changeworkflow()">
+						<aui:option value="admin">Assign to Administrator</aui:option>
+					   <% 
+					   //Compare with the organization roles instead of the regular roles as the user would be per orgainzation as per discussion.
+					   for (UserGroupRole userGroupRole : UserGroupRoleLocalServiceUtil.getUserGroupRoles(-1, -1)) {
+						   if(userGroupRole.getRoleId() == RoleLocalServiceUtil.getRole(themeDisplay.getCompanyId(), "Organization Content Reviewer").getRoleId()){
+					   %>
+					   <aui:option value="<%= userGroupRole.getUserId() %>"><%= UserLocalServiceUtil.getUser(userGroupRole.getUserId()).getEmailAddress() %></aui:option>
+					   <% } %>
+					   <% } %>
+					</aui:select> 
+					<!-- Custom Code End -->
+								
 				</liferay-ui:panel>
 
 				<liferay-ui:panel
@@ -1032,11 +1052,21 @@ while (manageableCalendarsIterator.hasNext()) {
 function changeform(){
 	$("input[name$='_ExpandoAttribute--formId--']").val($(".form-id").val())
 }
+function changeworkflow(){
+	$("input[name$='_ExpandoAttribute--workflow--']").val($(".workflowassign").val())
+}
 $( document ).ready(function() {
+	$("input[name$='_ExpandoAttribute--workflow--']").parent().hide();
 	if($("input[name$='_ExpandoAttribute--formId--']").val() == "")
 		changeform();
 	else{
 		$(".form-id").val($("input[name$='_ExpandoAttribute--formId--']").val());
+	}
+	
+	if($("input[name$='_ExpandoAttribute--workflow--']").val() == "")
+		changeworkflow();
+	else{
+		$(".workflowassign").val($("input[name$='_ExpandoAttribute--workflow--']").val());
 	}
 });
 </script>
