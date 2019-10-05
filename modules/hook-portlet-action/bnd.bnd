@@ -1,0 +1,4 @@
+Bundle-Activator: com.action.customActionActivator
+Bundle-Name: hook-portlet-action
+Bundle-SymbolicName: com.action
+Bundle-Version: 1.0.0
