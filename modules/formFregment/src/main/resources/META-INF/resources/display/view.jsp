@@ -58,9 +58,6 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 			</c:when>
 			<c:when test="<%= ddmFormDisplayContext.isFormAvailable() %>">
 				<portlet:actionURL name="addFormInstanceRecord" var="addFormInstanceRecordActionURL" >
-				<!-- custom code -->
-					<portlet:param name="mvcRenderCommandName" value="/login/login" />
-				<!-- custom code -->
 				</portlet:actionURL>
 
 				<%
@@ -77,7 +74,7 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 						<c:if test="<%= Validator.isNull(redirectURL) %>">
 							<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 						</c:if>
-
+						<aui:input name="eventId" type="hidden" value="${param.eventId}" />
 						<aui:input name="groupId" type="hidden" value="<%= formInstance.getGroupId() %>" />
 						<aui:input name="formInstanceId" type="hidden" value="<%= formInstance.getFormInstanceId() %>" />
 						<aui:input name="languageId" type="hidden" value="<%= languageId %>" />
@@ -285,3 +282,16 @@ long formInstanceId = ddmFormDisplayContext.getFormInstanceId();
 		</div>
 	</div>
 </c:if>
+
+<script>
+$( document ).ready(function() {
+	$.urlParam = function (name) {
+	    var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+	                      .exec(window.location.search);
+
+	    return (results !== null) ? results[1] || 0 : false;
+	}
+	console.log($.urlParam('eventId')); 
+	$("input[name$=eventId]").val($.urlParam("eventId"));
+});
+</script>
