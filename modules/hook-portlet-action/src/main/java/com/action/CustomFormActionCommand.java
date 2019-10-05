@@ -14,9 +14,8 @@ import com.liferay.portal.kernel.util.StringPool;
 @Component(
 		 immediate = true,
 		 property = {
-		// formportlet		 //com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet
-		 "javax.portlet.name=com_liferay_login_web_portlet_LoginPortlet", //for login portlet
-		 "mvc.command.name=/login/login",
+		 "javax.portlet.name=com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet", //for form portlet
+		 "mvc.command.name=addFormInstanceRecord",
 		 "service.ranking:Integer=100"
 		 },
 		 service = MVCActionCommand.class
@@ -27,9 +26,8 @@ public class CustomFormActionCommand extends BaseMVCActionCommand{
 	 protected void doProcessAction(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
 	 
 	 System.out.println("executiong login authentication");
-	 String name = ParamUtil.get(actionRequest, "mvcRenderCommandName", StringPool.BLANK);
-	 System.out.println("name============"+name);
-	 
+	 String requestURLs = ParamUtil.get(actionRequest, "mvcRenderCommandName", StringPool.BLANK);
+	 System.out.println("requestURLs:"+requestURLs);
 	 mvcActionCommand.processAction(actionRequest, actionResponse);
 	 
 	 }
@@ -37,7 +35,7 @@ public class CustomFormActionCommand extends BaseMVCActionCommand{
 	 /*
 	 * You still execute original logic
 	 */
-	 @Reference(target = "(&(mvc.command.name=/login/login)(javax.portlet.name=com_liferay_login_web_portlet_LoginPortlet))")
+	 @Reference(target = "(&(mvc.command.name=addFormInstanceRecord)(javax.portlet.name=com_liferay_dynamic_data_mapping_form_web_portlet_DDMFormPortlet))")
 	 protected MVCActionCommand mvcActionCommand;
 
 
