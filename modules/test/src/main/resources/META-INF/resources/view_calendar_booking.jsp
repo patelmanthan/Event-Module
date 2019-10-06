@@ -126,7 +126,7 @@ AssetEntry layoutAssetEntry = AssetEntryLocalServiceUtil.getEntry(CalendarBookin
 			
 			<p>
 				<%=calendarBooking.getExpandoBridge().getAttribute("test") %>
-				<a target="_blank" href="<%="http://localhost:8080/web/forms/shared/-/form/"+calendarBooking.getExpandoBridge().getAttribute("formId") %>">Click here to register for the event.</a>
+				<a target="_blank" href="<%="http://localhost:8080/web/forms/shared/-/form/"+calendarBooking.getExpandoBridge().getAttribute("formId")+"?eventId="+calendarBooking.getCalendarBookingId() %>">Click here to register for the event.</a>
 			</p>
 			<div class="entry-categories">
 				<liferay-asset:asset-categories-summary
