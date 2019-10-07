@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<model-hints>
+	<model name="SpeakerEvent.model.Speaker">
+		<field name="speakerId" type="long" />
+		<field name="userId" type="long" />
+		<field name="firstName" type="String" />
+		<field name="lastName" type="String" />
+		<field name="email" type="String" />
+	</model>
+	<model name="SpeakerEvent.model.Speaker_Event">
+		<field name="id" type="long" />
+		<field name="speakerId" type="long" />
+		<field name="eventId" type="long" />
+	</model>
+</model-hints>

@@ -1,0 +1,9 @@
+Bundle-Name: SpeakerEvent-api
+Bundle-SymbolicName: SpeakerEvent.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	SpeakerEvent.exception,\
+	SpeakerEvent.model,\
+	SpeakerEvent.service,\
+	SpeakerEvent.service.persistence
+-includeresource: META-INF/service.xml=../SpeakerEvent-service/service.xml
